@@ -1,0 +1,113 @@
+import { useState } from 'react'
+import { useExpenses } from './hooks/useExpenses'
+import { Balance } from './components/Balance'
+import { ExpenseForm } from './components/ExpenseForm'
+import { ExpenseList } from './components/ExpenseList'
+import { CategoryChart } from './components/CategoryChart'
+import { MonthlyChart } from './components/MonthlyChart'
+import { Toolbar } from './components/Toolbar'
+import styles from './App.module.css'
+
+const TABS = ['Resumen', 'Agregar', 'Historial']
+
+export default function App() {
+  const [tab, setTab] = useState(0)
+  const [toast, setToast] = useState(null)
+
+  const {
+    expenses, addExpense, deleteExpense,
+    clearAll, exportCSV, importCSV, balance,
+  } = useExpenses()
+
+  const showToast = (msg, type = 'success') => {
+    setToast({ msg, type })
+    setTimeout(() => setToast(null), 3000)
+  }
+
+  const handleAdd = (expense) => {
+    addExpense(expense)
+    showToast(`${expense.isIncome ? 'Ingreso' : 'Gasto'} agregado correctamente`)
+    setTab(0)
+  }
+
+  const handleClear = () => {
+    if (confirm('¿Eliminar TODOS los registros? Esta acción no se puede deshacer.')) {
+      clearAll()
+      showToast('Todos los registros eliminados', 'warning')
+    }
+  }
+
+  const handleImport = async (file) => {
+    try {
+      const n = await importCSV(file)
+      showToast(`${n} registros importados`)
+    } catch (err) {
+      showToast(err.message, 'error')
+    }
+  }
+
+  return (
+    <div className={styles.app}>
+      <header className={styles.header}>
+        <div className={styles.headerInner}>
+          <div className={styles.brand}>
+            <span>💸</span>
+            <h1>Control de Gastos</h1>
+          </div>
+          <Toolbar
+            count={expenses.length}
+            onExportCSV={exportCSV}
+            onImportCSV={handleImport}
+            onClearAll={handleClear}
+          />
+        </div>
+      </header>
+
+      <nav className={styles.nav}>
+        {TABS.map((t, i) => (
+          <button
+            key={t}
+            className={`${styles.navBtn} ${tab === i ? styles.active : ''}`}
+            onClick={() => setTab(i)}
+          >
+            {t}
+          </button>
+        ))}
+      </nav>
+
+      <main className={styles.main}>
+        {tab === 0 && (
+          <div className={styles.grid}>
+            <div className={styles.full}>
+              <Balance balance={balance} />
+            </div>
+            <CategoryChart expenses={expenses} />
+            <MonthlyChart expenses={expenses} />
+            <div className={styles.full}>
+              <ExpenseList
+                expenses={expenses.slice(0, 5)}
+                onDelete={deleteExpense}
+              />
+            </div>
+          </div>
+        )}
+
+        {tab === 1 && (
+          <div className={styles.formWrap}>
+            <ExpenseForm onAdd={handleAdd} />
+          </div>
+        )}
+
+        {tab === 2 && (
+          <ExpenseList expenses={expenses} onDelete={deleteExpense} />
+        )}
+      </main>
+
+      {toast && (
+        <div className={`${styles.toast} ${styles[toast.type]}`}>
+          {toast.msg}
+        </div>
+      )}
+    </div>
+  )
+}
