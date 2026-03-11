@@ -167,6 +167,7 @@
   /* Área de contenido: scroll interno */
   .main {
     flex: 1;
+    overflow-x: hidden;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     padding: 14px 12px 20px;

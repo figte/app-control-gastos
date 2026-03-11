@@ -15,6 +15,11 @@
   margin: 0 -8px;
 }
 
+@media (max-width: 900px) {
+  .wrapper { padding: 16px; }
+  .chartArea { margin: 0; }
+}
+
 .empty {
   background: var(--surface);
   border-radius: var(--radius);

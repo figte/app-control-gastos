@@ -10,3 +10,7 @@
   font-weight: 700;
   margin-bottom: 16px;
 }
+
+@media (max-width: 900px) {
+  .wrapper { padding: 16px; }
+}

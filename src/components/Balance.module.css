@@ -43,7 +43,7 @@
 .negative { border-left-color: #f59e0b; }
 .negative .amount { color: #f59e0b; }
 
-@media (max-width: 640px) {
+@media (max-width: 900px) {
   .grid { grid-template-columns: 1fr; gap: 10px; }
   .card { padding: 14px; }
   .amount { font-size: 1.1rem; }
