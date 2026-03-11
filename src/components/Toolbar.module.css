@@ -117,10 +117,13 @@
   border-radius: var(--radius);
   box-shadow: 0 8px 32px rgba(0,0,0,0.18);
   padding: 20px;
-  z-index: 200;
+  z-index: 150;   /* below bottom nav z-index=20 is fine, panel is above content */
   max-width: 420px;
   width: calc(100vw - 32px);
   animation: fadeIn 0.18s ease;
+  /* keep panel visible above bottom nav on mobile */
+  max-height: calc(100dvh - 80px);
+  overflow-y: auto;
 }
 
 .formatCode {
@@ -151,7 +154,7 @@
 .closeFormat:hover { opacity: 0.9; }
 
 /* ── Mobile override ─────────────────────────── */
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   .bar        { display: none; }
   .mobileMenu { display: block; }
 }

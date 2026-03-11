@@ -144,15 +144,15 @@
   to   { transform: translateX(-50%) translateY(0);    opacity: 1; }
 }
 
-/* ── Mobile (≤ 768px) ─────────────────────────── */
-@media (max-width: 768px) {
+/* ── Mobile (≤ 900px) ─────────────────────────── */
+@media (max-width: 900px) {
 
   .headerInner { padding: 10px 14px; }
   .brand h1    { font-size: 1.05rem; }
   .brand span  { font-size: 1.3rem; }
   .installBtn  { padding: 7px 12px; font-size: 0.8rem; }
 
-  /* hide top nav on mobile */
+  /* hide top nav, show bottom nav */
   .topNav { display: none; }
 
   .main {
