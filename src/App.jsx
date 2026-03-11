@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useExpenses } from './hooks/useExpenses'
 import { Balance } from './components/Balance'
 import { ExpenseForm } from './components/ExpenseForm'
@@ -17,6 +17,32 @@ const TABS = [
 export default function App() {
   const [tab, setTab] = useState(0)
   const [toast, setToast] = useState(null)
+  const [installPrompt, setInstallPrompt] = useState(null)
+  const installPromptRef = useRef(null)
+
+  useEffect(() => {
+    const handler = (e) => {
+      e.preventDefault()
+      installPromptRef.current = e
+      setInstallPrompt(e)
+    }
+    window.addEventListener('beforeinstallprompt', handler)
+    window.addEventListener('appinstalled', () => setInstallPrompt(null))
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handler)
+    }
+  }, [])
+
+  const handleInstall = async () => {
+    const prompt = installPromptRef.current
+    if (!prompt) return
+    prompt.prompt()
+    const { outcome } = await prompt.userChoice
+    if (outcome === 'accepted') {
+      setInstallPrompt(null)
+      installPromptRef.current = null
+    }
+  }
 
   const {
     expenses, addExpense, deleteExpense,
@@ -58,12 +84,19 @@ export default function App() {
             <span>💸</span>
             <h1>Control de Gastos</h1>
           </div>
-          <Toolbar
+          <div className={styles.headerRight}>
+            {installPrompt && (
+              <button className={styles.installBtn} onClick={handleInstall}>
+                📲 Instalar app
+              </button>
+            )}
+            <Toolbar
             count={expenses.length}
             onExportCSV={exportCSV}
             onImportCSV={handleImport}
             onClearAll={handleClear}
-          />
+            />
+          </div>
         </div>
       </header>
 

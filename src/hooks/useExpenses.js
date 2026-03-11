@@ -2,6 +2,27 @@ import { useState, useEffect, useCallback } from 'react'
 
 const STORAGE_KEY = 'control-gastos-data'
 
+// Properly handles quoted fields that may contain commas
+function parseCSVLine(line) {
+  const fields = []
+  let field = ''
+  let inQuotes = false
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i]
+    if (inQuotes) {
+      if (ch === '"' && line[i + 1] === '"') { field += '"'; i++ }
+      else if (ch === '"') { inQuotes = false }
+      else { field += ch }
+    } else {
+      if (ch === '"') { inQuotes = true }
+      else if (ch === ',') { fields.push(field); field = '' }
+      else { field += ch }
+    }
+  }
+  fields.push(field)
+  return fields
+}
+
 const loadFromStorage = () => {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
@@ -46,7 +67,8 @@ export const useExpenses = () => {
 
   const exportCSV = useCallback(() => {
     if (expenses.length === 0) return
-    const headers = ['Fecha', 'Descripción', 'Categoría', 'Monto', 'Tipo']
+    // ASCII-only headers → guaranteed to display correctly in any spreadsheet app
+    const headers = ['Fecha', 'Descripcion', 'Categoria', 'Monto', 'Tipo']
     const rows = expenses.map(e => [
       e.date,
       `"${e.description.replace(/"/g, '""')}"`,
@@ -54,8 +76,12 @@ export const useExpenses = () => {
       e.amount,
       e.isIncome ? 'Ingreso' : 'Gasto',
     ])
-    const csv = [headers, ...rows].map(r => r.join(',')).join('\n')
-    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' })
+    const csv = [headers, ...rows].map(r => r.join(',')).join('\r\n')
+    // Explicit UTF-8 BOM bytes for maximum spreadsheet compatibility
+    const encoder = new TextEncoder()
+    const bom = new Uint8Array([0xEF, 0xBB, 0xBF])
+    const content = encoder.encode(csv)
+    const blob = new Blob([bom, content], { type: 'text/csv;charset=utf-8;' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
@@ -69,14 +95,15 @@ export const useExpenses = () => {
       const reader = new FileReader()
       reader.onload = (e) => {
         try {
+          // Strip UTF-8 BOM if present
           const text = e.target.result.replace(/^\uFEFF/, '')
-          const lines = text.trim().split('\n')
+          const lines = text.trim().split(/\r?\n/)
           const imported = lines.slice(1).map(line => {
-            const [date, description, category, amount, tipo] = line.split(',')
+            const [date, description, category, amount, tipo] = parseCSVLine(line)
             return {
               id: crypto.randomUUID(),
               date: date?.trim(),
-              description: description?.replace(/^"|"$/g, '').replace(/""/g, '"').trim(),
+              description: description?.trim(),
               category: category?.trim(),
               amount: parseFloat(amount),
               isIncome: tipo?.trim() === 'Ingreso',
@@ -90,7 +117,7 @@ export const useExpenses = () => {
         }
       }
       reader.onerror = () => reject(new Error('Error al leer el archivo'))
-      reader.readAsText(file)
+      reader.readAsText(file, 'UTF-8')
     })
   }, [])
 

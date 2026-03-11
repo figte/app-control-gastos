@@ -106,6 +106,50 @@
 .dropDanger { color: var(--danger); }
 .dropDanger:hover:not(:disabled) { background: #fff1f2; }
 
+/* ── Format panel ────────────────────────────── */
+.formatPanel {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  padding: 20px;
+  z-index: 200;
+  max-width: 420px;
+  width: calc(100vw - 32px);
+  animation: fadeIn 0.18s ease;
+}
+
+.formatCode {
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.closeFormat {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.closeFormat:hover { opacity: 0.9; }
+
 /* ── Mobile override ─────────────────────────── */
 @media (max-width: 768px) {
   .bar        { display: none; }
