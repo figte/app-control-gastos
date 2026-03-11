@@ -8,7 +8,11 @@ import { MonthlyChart } from './components/MonthlyChart'
 import { Toolbar } from './components/Toolbar'
 import styles from './App.module.css'
 
-const TABS = ['Resumen', 'Agregar', 'Historial']
+const TABS = [
+  { label: 'Resumen',   icon: '📊' },
+  { label: 'Agregar',   icon: '➕' },
+  { label: 'Historial', icon: '📋' },
+]
 
 export default function App() {
   const [tab, setTab] = useState(0)
@@ -63,14 +67,15 @@ export default function App() {
         </div>
       </header>
 
-      <nav className={styles.nav}>
+      {/* Top nav — desktop only */}
+      <nav className={styles.topNav}>
         {TABS.map((t, i) => (
           <button
-            key={t}
-            className={`${styles.navBtn} ${tab === i ? styles.active : ''}`}
+            key={t.label}
+            className={`${styles.topNavBtn} ${tab === i ? styles.active : ''}`}
             onClick={() => setTab(i)}
           >
-            {t}
+            {t.icon} {t.label}
           </button>
         ))}
       </nav>
@@ -102,6 +107,20 @@ export default function App() {
           <ExpenseList expenses={expenses} onDelete={deleteExpense} />
         )}
       </main>
+
+      {/* Bottom nav — mobile only */}
+      <nav className={styles.bottomNav} aria-label="Navegación principal">
+        {TABS.map((t, i) => (
+          <button
+            key={t.label}
+            className={`${styles.bottomNavBtn} ${tab === i ? styles.bottomActive : ''}`}
+            onClick={() => setTab(i)}
+          >
+            <span className={styles.bottomIcon}>{t.icon}</span>
+            <span className={styles.bottomLabel}>{t.label}</span>
+          </button>
+        ))}
+      </nav>
 
       {toast && (
         <div className={`${styles.toast} ${styles[toast.type]}`}>
