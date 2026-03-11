@@ -38,6 +38,37 @@
   letter-spacing: -0.02em;
 }
 
+/* ── Header right group ──────────────────────── */
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.installBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.15s, transform 0.1s;
+  animation: pulse 2s infinite;
+}
+.installBtn:hover  { opacity: 0.9; }
+.installBtn:active { transform: scale(0.97); }
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(99,102,241,0.4); }
+  50%       { box-shadow: 0 0 0 6px rgba(99,102,241,0); }
+}
+
 /* ── Top nav (desktop) ────────────────────────── */
 .topNav {
   background: white;
@@ -113,20 +144,33 @@
   to   { transform: translateX(-50%) translateY(0);    opacity: 1; }
 }
 
-/* ── Mobile (≤ 768px) ─────────────────────────── */
-@media (max-width: 768px) {
+/* ── Mobile (≤ 900px) — App Shell pattern ──────── */
+@media (max-width: 900px) {
+
+  /* Contenedor fijo: solo .main hace scroll internamente */
+  .app {
+    height: 100dvh;
+    overflow: hidden;
+  }
 
   .headerInner { padding: 10px 14px; }
   .brand h1    { font-size: 1.05rem; }
   .brand span  { font-size: 1.3rem; }
+  .installBtn  { padding: 7px 12px; font-size: 0.8rem; }
 
-  /* hide top nav on mobile */
+  /* El header es un flex-item, no necesita sticky */
+  .header { position: relative; }
+
+  /* hide top nav */
   .topNav { display: none; }
 
+  /* Área de contenido: scroll interno */
   .main {
-    padding: 14px 12px;
-    /* leave room for fixed bottom nav + safe area */
-    padding-bottom: calc(68px + env(safe-area-inset-bottom, 0px));
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 14px 12px 20px;
+    /* sin padding-bottom extra: la nav ya está en el flujo */
   }
 
   .grid {
@@ -136,17 +180,13 @@
 
   .formWrap { max-width: 100%; }
 
-  /* show bottom tab bar */
+  /* Barra inferior: flex-item fijo en el layout, NUNCA hace scroll */
   .bottomNav {
     display: flex;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    flex-shrink: 0;           /* no se comprime */
     background: white;
     border-top: 1px solid var(--border);
     box-shadow: 0 -2px 16px rgba(0,0,0,0.09);
-    z-index: 20;
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
 
@@ -166,12 +206,8 @@
   }
   .bottomNavBtn:active { background: var(--surface-2); }
 
-  .bottomActive {
-    color: var(--primary) !important;
-  }
-  .bottomActive .bottomIcon {
-    transform: scale(1.18);
-  }
+  .bottomActive { color: var(--primary) !important; }
+  .bottomActive .bottomIcon { transform: scale(1.18); }
 
   .bottomIcon {
     font-size: 1.5rem;
@@ -185,9 +221,9 @@
     letter-spacing: 0.01em;
   }
 
-  /* toast above bottom nav */
+  /* toast justo arriba de la barra */
   .toast {
-    bottom: calc(70px + env(safe-area-inset-bottom, 0px));
+    bottom: calc(66px + env(safe-area-inset-bottom, 0px));
     font-size: 0.85rem;
     padding: 10px 18px;
   }

@@ -1,8 +1,22 @@
 import { useState, useRef, useEffect } from 'react'
 import styles from './Toolbar.module.css'
 
+const CSV_FORMAT = `Formato CSV esperado (UTF-8):
+Fecha,Descripcion,Categoria,Monto,Tipo
+
+Columnas:
+• Fecha     → YYYY-MM-DD  (ej: 2026-03-11)
+• Descripcion → texto libre
+• Categoria → alimentacion | transporte |
+              salud | entretenimiento |
+              educacion | hogar | ropa |
+              servicios | ingresos | otro
+• Monto     → número positivo  (ej: 15000)
+• Tipo      → Ingreso | Gasto`
+
 export const Toolbar = ({ onExportCSV, onImportCSV, onClearAll, count }) => {
   const [open, setOpen] = useState(false)
+  const [showFormat, setShowFormat] = useState(false)
   const menuRef = useRef(null)
 
   const handleImport = (e) => {
@@ -32,10 +46,20 @@ export const Toolbar = ({ onExportCSV, onImportCSV, onClearAll, count }) => {
         <button className={styles.btn} onClick={onExportCSV} disabled={count === 0}>
           💾 Exportar CSV
         </button>
+        <button className={styles.btn} onClick={() => setShowFormat(v => !v)} title="Ver formato CSV">
+          ℹ️ Formato
+        </button>
         <button className={`${styles.btn} ${styles.danger}`} onClick={onClearAll} disabled={count === 0}>
           🗑️ Limpiar todo
         </button>
       </div>
+
+      {showFormat && (
+        <div className={styles.formatPanel}>
+          <pre className={styles.formatCode}>{CSV_FORMAT}</pre>
+          <button className={styles.closeFormat} onClick={() => setShowFormat(false)}>✕ Cerrar</button>
+        </div>
+      )}
 
       {/* Mobile: hamburger + dropdown */}
       <div className={styles.mobileMenu} ref={menuRef}>
@@ -64,12 +88,25 @@ export const Toolbar = ({ onExportCSV, onImportCSV, onClearAll, count }) => {
               <span>💾</span> Exportar CSV
             </button>
             <button
+              className={styles.dropItem}
+              onClick={() => { setShowFormat(v => !v); setOpen(false) }}
+            >
+              <span>ℹ️</span> Formato CSV
+            </button>
+            <button
               className={`${styles.dropItem} ${styles.dropDanger}`}
               onClick={() => { onClearAll(); setOpen(false) }}
               disabled={count === 0}
             >
               <span>🗑️</span> Limpiar todo
             </button>
+          </div>
+        )}
+
+        {showFormat && (
+          <div className={styles.formatPanel}>
+            <pre className={styles.formatCode}>{CSV_FORMAT}</pre>
+            <button className={styles.closeFormat} onClick={() => setShowFormat(false)}>✕ Cerrar</button>
           </div>
         )}
       </div>
